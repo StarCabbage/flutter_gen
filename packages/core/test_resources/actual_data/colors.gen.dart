@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 class ColorName {
   ColorName._();
 
+  /// Color: rgba(0, 0, 0, 0.4)
+  static const Color overlay2 = Color.fromRGBO(gba(0, 0, 0, 0.4));
+
   /// Color: #000000
   static const Color black = Color(0xFF000000);
 

@@ -14,6 +14,12 @@ String colorFromHex(String hexColor) {
   return '0x$hexColor';
 }
 
+/// e.g. rgba(0, 0, 0, 0.2) -> 0, 0, 0, 0.2
+String colorFromRgba(String rgbaColor) {
+  final pattern = RegExp('[rgba()]');
+  return rgbaColor.replaceFirst(pattern, '');
+}
+
 /// [Material Design Color Generator](https://github.com/mbitson/mcg)
 /// Constantin/Buckner logic: https://github.com/mbitson/mcg/blob/858cffea0d79ac143d590d110fbe20a1ea54d59d/scripts/controllers/ColorGeneratorCtrl.js#L238
 Map<int, String> swatchFromPrimaryHex(String primaryHex) {

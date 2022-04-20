@@ -34,18 +34,28 @@ String generateColors(
 
   final colorList = <_Color>[];
   colors.inputs
-      .map((file) => ColorPath(join(pubspecFile.parent.path, file)))
+      .flatMap((element) {
+        final elementPath = join(pubspecFile.parent.path, element);
+        final isDirectory = FileSystemEntity.isDirectorySync(elementPath);
+        if (isDirectory) {
+          return Directory(elementPath)
+              .listSync(recursive: true)
+              .map((e) => e.path);
+        }
+        return [elementPath];
+      })
+      .map((file) => ColorPath(file))
       .forEach((colorFile) {
-    final data = colorFile.file.readAsStringSync();
-    if (colorFile.isXml) {
-      colorList.addAll(
-          XmlDocument.parse(data).findAllElements('color').map((element) {
-        return _Color.fromXmlElement(element);
-      }));
-    } else {
-      throw 'Not supported file type ${colorFile.mime}.';
-    }
-  });
+        final data = colorFile.file.readAsStringSync();
+        if (colorFile.isXml) {
+          colorList.addAll(
+              XmlDocument.parse(data).findAllElements('color').map((element) {
+            return _Color.fromXmlElement(element);
+          }));
+        } else {
+          throw 'Not supported file type ${colorFile.mime}.';
+        }
+      });
 
   colorList
       .distinctBy((color) => color.name)
@@ -60,7 +70,7 @@ String generateColors(
 String _colorStatement(_Color color) {
   final buffer = StringBuffer();
   if (color.isMaterial) {
-    final swatch = swatchFromPrimaryHex(color.hex);
+    final swatch = swatchFromPrimaryHex(color.color);
     final statement = '''/// MaterialColor: 
         ${swatch.entries.map((e) => '///   ${e.key}: ${hexFromColor(e.value)}').join('\n')}
         static const MaterialColor ${color.name.camelCase()} = MaterialColor(
@@ -72,7 +82,7 @@ String _colorStatement(_Color color) {
     buffer.writeln(statement);
   }
   if (color.isMaterialAccent) {
-    final accentSwatch = accentSwatchFromPrimaryHex(color.hex);
+    final accentSwatch = accentSwatchFromPrimaryHex(color.color);
     final statement = '''/// MaterialAccentColor: 
         ${accentSwatch.entries.map((e) => '///   ${e.key}: ${hexFromColor(e.value)}').join('\n')}
         static const MaterialAccentColor ${color.name.camelCase()}Accent = MaterialAccentColor(
@@ -84,9 +94,13 @@ String _colorStatement(_Color color) {
     buffer.writeln(statement);
   }
   if (color.isNormal) {
-    final comment = '/// Color: ${color.hex}';
-    final statement =
-        '''static const Color ${color.name.camelCase()} = Color(${colorFromHex(color.hex)});''';
+    final comment = '/// Color: ${color.color}';
+    var statement = '''static const Color ${color.name.camelCase()} = ''';
+    if (color.isRgba) {
+      statement += 'Color.fromRGBO(${colorFromRgba(color.color)});';
+    } else {
+      statement += 'Color(${colorFromHex(color.color)});';
+    }
 
     buffer.writeln(comment);
     buffer.writeln(statement);
@@ -97,7 +111,7 @@ String _colorStatement(_Color color) {
 class _Color {
   const _Color(
     this.name,
-    this.hex,
+    this.color,
     this._types,
   );
 
@@ -110,9 +124,11 @@ class _Color {
 
   final String name;
 
-  final String hex;
+  final String color;
 
   final List<String> _types;
+
+  bool get isRgba => color.contains('rgba');
 
   bool get isNormal => _types.isEmpty;
 
