@@ -158,10 +158,12 @@ packages:
   flutter_gen_core:
     dependency: "direct main"
     description:
-      name: flutter_gen_core
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.6"
+      path: "packages/core"
+      ref: HEAD
+      resolved-ref: "744de64d978c8bf407369aa37c1d52452f47b45e"
+      url: "git@github.com:BTSMain/flutter_gen.git"
+    source: git
+    version: "4.1.6-bts.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -316,6 +318,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  rxdart:
+    dependency: transitive
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.27.3"
   shelf:
     dependency: transitive
     description:
