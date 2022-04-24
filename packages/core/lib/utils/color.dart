@@ -14,10 +14,11 @@ String colorFromHex(String hexColor) {
   return '0x$hexColor';
 }
 
+final pattern = RegExp('[rgba()]');
+
 /// e.g. rgba(0, 0, 0, 0.2) -> 0, 0, 0, 0.2
 String colorFromRgba(String rgbaColor) {
-  final pattern = RegExp('[rgba()]');
-  return rgbaColor.replaceFirst(pattern, '');
+  return rgbaColor.replaceAll(pattern, '');
 }
 
 /// [Material Design Color Generator](https://github.com/mbitson/mcg)
