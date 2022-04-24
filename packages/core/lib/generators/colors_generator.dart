@@ -40,6 +40,7 @@ String generateColors(
         if (isDirectory) {
           return Directory(elementPath)
               .listSync(recursive: true)
+              .whereType<File>()
               .map((e) => e.path);
         }
         return [elementPath];
